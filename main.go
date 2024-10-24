@@ -58,11 +58,12 @@ func main() {
 		"<134>Jul 17 14:02:49 combo ftpd[24362]: connection from 207.30.238.8 (host8.topspot.net) at Sun Jul 17 14:02:49 2005 ",
 		"<134>Jul 17 14:02:49 combo ftpd[24363]: connection from 207.30.238.8 (host8.topspot.net) at Sun Jul 17 14:02:49 2005 "}
 
-	// Seed the random generator
-	rand.Seed(time.Now().UnixNano())
+	// Create a new random generator
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// -logs to send logs boolean
 	logsFlag := flag.Bool("logs", false, "send logs")
+	flag.Parse()
 	// Resolve the UDP address
 	serverAddr, err := net.ResolveUDPAddr("udp", ":11113")
 	if err != nil {
@@ -82,7 +83,7 @@ func main() {
 
 		for {
 			// Select a random log
-			log := logs[rand.Intn(len(logs))]
+			log := logs[r.Intn(len(logs))]
 			fmt.Printf("Sending log: %s (%s)\n", log, time.Now().Format("2006-01-02 15:04:05"))
 			// Send the log
 			_, err := conn.Write([]byte(log + "\n"))
@@ -92,7 +93,7 @@ func main() {
 			}
 
 			// Sleep for a random duration between 1 and 4 seconds
-			time.Sleep(time.Duration(rand.Intn(10)+1) * time.Second)
+			time.Sleep(time.Duration(r.Intn(3)+1) * time.Second)
 		}
 	} else {
 		// Send message
